@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EVIDENCE-X — Hackathon Presentation Video</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Rajdhani:wght@500;600;700&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#020509;--s1:#040810;--s2:#060C16;--s3:#0C1628;
+  --b1:#101E30;--b2:#172840;--b3:#1E3454;
+  --accent:#00C9FF;--accent2:#0090CC;--accent3:#005A80;
+  --gold:#FFB800;--gold2:#CC9200;
+  --green:#00E87A;--green2:#009950;
+  --amber:#FFB020;
+  --red:#FF3B3B;--red2:#CC1F1F;
+  --text:#C8D8F0;--text2:#7A9ABF;--text3:#3A5270;
+  --mono:'JetBrains Mono',monospace;
+  --head:'Rajdhani',sans-serif;
+  --body:'Exo 2',sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:#000;font-family:var(--body);}
+
+/* ── STAGE ── */
+#stage{
+  width:100vw;height:100vh;
+  position:relative;overflow:hidden;
+  background:var(--bg);
+}
+
+/* ── SCANLINE EFFECT ── */
+#stage::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.05) 3px,rgba(0,0,0,.05) 4px);
+  pointer-events:none;z-index:9999;
+}
+
+/* ── SLIDE BASE ── */
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  padding:60px 80px;
+  opacity:0;pointer-events:none;
+  transition:opacity .6s;
+}
+.slide.active{opacity:1;pointer-events:all;}
+
+/* ── PROGRESS BAR ── */
+#progressBar{
+  position:fixed;bottom:0;left:0;height:3px;
+  background:linear-gradient(90deg,var(--accent3),var(--accent),var(--gold));
+  transition:width .3s ease;z-index:10000;
+}
+#slideCounter{
+  position:fixed;bottom:12px;right:20px;
+  font-family:var(--mono);font-size:11px;color:var(--text3);
+  z-index:10000;letter-spacing:2px;
+}
+#controls{
+  position:fixed;bottom:8px;left:50%;transform:translateX(-50%);
+  display:flex;gap:10px;z-index:10000;align-items:center;
+}
+.ctrl-btn{
+  background:rgba(0,201,255,.08);border:1px solid rgba(0,201,255,.2);
+  color:var(--text2);font-family:var(--mono);font-size:11px;
+  padding:5px 14px;border-radius:3px;cursor:pointer;letter-spacing:1px;
+  transition:all .15s;
+}
+.ctrl-btn:hover{background:rgba(0,201,255,.18);color:var(--accent);}
+#autoLabel{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1px;}
+#timerDot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green);
+  display:inline-block;margin-right:4px;
+  animation:tdot 1s infinite;
+}
+@keyframes tdot{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* ── ANIMATED ELEMENTS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-30px);}to{opacity:1;transform:translateX(0);}}
+@keyframes slideRight{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.88);}to{opacity:1;transform:scale(1);}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 20px rgba(0,201,255,.2);}50%{box-shadow:0 0 40px rgba(0,201,255,.5);}}
+@keyframes lineGrow{from{width:0;}to{width:100%;}}
+@keyframes countUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes hashScroll{0%{transform:translateY(0);}100%{transform:translateY(-50%);}}
+
+.a1{animation:fadeUp .7s ease both;}
+.a2{animation:fadeUp .7s .15s ease both;}
+.a3{animation:fadeUp .7s .3s ease both;}
+.a4{animation:fadeUp .7s .45s ease both;}
+.a5{animation:fadeUp .7s .6s ease both;}
+.a6{animation:fadeUp .7s .75s ease both;}
+.al1{animation:slideLeft .6s ease both;}
+.al2{animation:slideLeft .6s .15s ease both;}
+.al3{animation:slideLeft .6s .3s ease both;}
+.ar1{animation:slideRight .6s ease both;}
+.ar2{animation:slideRight .6s .15s ease both;}
+.ar3{animation:slideRight .6s .3s ease both;}
+.sc1{animation:scaleIn .6s ease both;}
+.sc2{animation:scaleIn .6s .15s ease both;}
+.sc3{animation:scaleIn .6s .3s ease both;}
+
+/* ── SHARED COMPONENTS ── */
+.slide-tag{
+  font-family:var(--mono);font-size:10px;letter-spacing:3px;
+  text-transform:uppercase;padding:4px 14px;
+  border-radius:2px;margin-bottom:20px;
+  display:inline-block;
+}
+.tag-gold{background:var(--gold2);color:#000;}
+.tag-accent{background:rgba(0,201,255,.15);color:var(--accent);border:1px solid rgba(0,201,255,.3);}
+.tag-red{background:rgba(255,59,59,.15);color:var(--red);border:1px solid rgba(255,59,59,.3);}
+.tag-green{background:rgba(0,232,122,.12);color:var(--green);border:1px solid rgba(0,232,122,.25);}
+
+.slide-h1{
+  font-family:var(--head);font-size:64px;font-weight:800;
+  color:#fff;letter-spacing:2px;line-height:1.05;
+  text-align:center;margin-bottom:16px;
+}
+.slide-h2{
+  font-family:var(--head);font-size:46px;font-weight:700;
+  color:#fff;letter-spacing:1.5px;line-height:1.1;
+  margin-bottom:12px;
+}
+.slide-h3{
+  font-family:var(--head);font-size:32px;font-weight:700;
+  color:var(--text);letter-spacing:1px;margin-bottom:10px;
+}
+.slide-sub{
+  font-size:18px;color:var(--text2);text-align:center;
+  line-height:1.7;max-width:760px;
+}
+.accent-line{
+  width:80px;height:3px;border-radius:2px;margin:16px auto;
+  background:linear-gradient(90deg,var(--accent3),var(--accent));
+}
+
+/* ── GRIDS ── */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;width:100%;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;width:100%;}
+
+/* ── CARDS ── */
+.gcard{
+  background:var(--s2);border:1px solid var(--b2);
+  border-radius:10px;padding:24px;
+  position:relative;overflow:hidden;
+}
+.gcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.gcard.blue::before{background:linear-gradient(90deg,var(--accent3),var(--accent));}
+.gcard.gold::before{background:linear-gradient(90deg,var(--gold2),var(--gold));}
+.gcard.green::before{background:linear-gradient(90deg,var(--green2),var(--green));}
+.gcard.red::before{background:linear-gradient(90deg,var(--red2),var(--red));}
+.gcard.amber::before{background:linear-gradient(90deg,#CC6000,var(--amber));}
+.card-num{
+  font-family:var(--mono);font-size:11px;color:var(--text3);
+  letter-spacing:2px;margin-bottom:10px;
+}
+.card-ico{font-size:32px;margin-bottom:12px;display:block;}
+.card-title{font-family:var(--head);font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:.5px;}
+.card-body{font-size:13px;color:var(--text3);line-height:1.7;}
+
+/* ── TIER PILL ── */
+.tier-row{
+  display:flex;align-items:center;gap:0;
+  width:100%;margin-bottom:28px;
+  background:var(--s2);border:1px solid var(--b1);
+  border-radius:8px;padding:14px 20px;
+  overflow-x:auto;
+}
+.tier-item{
+  display:flex;flex-direction:column;align-items:center;
+  flex:1;padding:6px 8px;
+}
+.tier-num{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  margin-bottom:6px;flex-shrink:0;
+}
+.tier-label{font-family:var(--head);font-size:12px;font-weight:700;color:var(--text3);letter-spacing:.5px;text-align:center;}
+.tier-sub{font-size:10px;color:var(--text3);font-family:var(--mono);text-align:center;margin-top:2px;}
+.tier-arrow{color:var(--text3);font-size:14px;flex-shrink:0;margin:0 4px;align-self:center;}
+
+/* ── STAT NUMBERS ── */
+.big-stats{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+.bstat{text-align:center;}
+.bstat-num{
+  font-family:var(--mono);font-size:72px;font-weight:700;
+  line-height:1;display:block;margin-bottom:6px;
+}
+.bstat-lbl{font-size:14px;color:var(--text3);letter-spacing:.5px;}
+
+/* ── HEATMAP DEMO ── */
+.hm-demo{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:16px;width:100%;
+}
+.scan-paper{
+  background:#EDE8DC;border-radius:8px;
+  padding:18px;font-family:'Courier New',monospace;
+  font-size:11px;color:#1a1a2e;line-height:2;
+  position:relative;
+  filter:blur(.15px);
+}
+.scan-lines-bg{
+  position:absolute;inset:0;border-radius:8px;
+  background:repeating-linear-gradient(0deg,transparent,transparent 26px,rgba(0,0,0,.05) 26px,rgba(0,0,0,.05) 27px);
+  pointer-events:none;
+}
+.scan-hdr{position:absolute;top:5px;right:8px;font-size:8px;color:#aaa;letter-spacing:2px;}
+.ai-paper{
+  background:var(--s3);border:1px solid var(--b2);
+  border-radius:8px;padding:18px;
+  font-size:12px;line-height:2.1;
+}
+.w-g{background:rgba(0,232,122,.12);color:#4ADE80;padding:1px 3px;border-radius:3px;}
+.w-y{background:rgba(255,176,32,.18);color:var(--amber);padding:1px 3px;border-radius:3px;cursor:pointer;}
+.w-r{
+  background:rgba(255,59,59,.2);color:var(--red);
+  padding:1px 3px;border-radius:3px;font-weight:700;
+  border-bottom:2px solid var(--red);
+  animation:rpulse 2s infinite;
+}
+@keyframes rpulse{0%,100%{background:rgba(255,59,59,.2);}50%{background:rgba(255,59,59,.38);}}
+.popup-box{
+  position:absolute;right:0;top:-10px;
+  background:var(--s2);border:1px solid var(--gold);
+  border-radius:8px;padding:12px 14px;
+  min-width:200px;box-shadow:0 8px 30px rgba(0,0,0,.5);
+  z-index:10;animation:scaleIn .4s 1.2s ease both;opacity:0;
+}
+.popup-title{font-family:var(--mono);font-size:9px;color:var(--red);font-weight:700;margin-bottom:8px;letter-spacing:1px;}
+.popup-sug{padding:6px 10px;background:var(--s3);border:1px solid var(--b1);border-radius:4px;margin-bottom:5px;font-size:12px;font-weight:600;color:var(--text);display:flex;justify-content:space-between;}
+.popup-sug.hi{border-color:var(--gold);background:rgba(255,184,0,.08);}
+.sug-pct{font-family:var(--mono);font-size:10px;color:var(--green);}
+
+/* ── AUDIT FEED ── */
+.audit-feed{
+  background:var(--s2);border:1px solid var(--b1);
+  border-radius:10px;overflow:hidden;width:100%;
+}
+.af-header{
+  padding:12px 16px;border-bottom:1px solid var(--b1);
+  background:var(--s3);display:flex;align-items:center;gap:10px;
+}
+.af-title{font-family:var(--head);font-size:15px;font-weight:700;color:var(--text);letter-spacing:.5px;}
+.af-badge{font-family:var(--mono);font-size:8px;color:var(--green);background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.2);padding:3px 9px;border-radius:2px;margin-left:auto;}
+.ae{display:flex;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(16,30,48,.7);}
+.ae:last-child{border-bottom:none;}
+.ae-t{font-family:var(--mono);font-size:9px;color:var(--text3);min-width:72px;flex-shrink:0;}
+.ae-ico2{width:26px;height:26px;border-radius:5px;background:var(--s3);border:1px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.ae-b{flex:1;}
+.ae-a{font-family:var(--head);font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+.ae-m{font-family:var(--mono);font-size:9px;color:var(--text3);}
+.t-tag{font-size:8px;font-family:var(--mono);font-weight:700;padding:1px 6px;border-radius:2px;}
+.t-create{background:rgba(0,201,255,.1);color:var(--accent);border:1px solid rgba(0,201,255,.2);}
+.t-seal{background:rgba(0,232,122,.1);color:var(--green);border:1px solid rgba(0,232,122,.2);}
+.t-edit{background:rgba(255,176,32,.1);color:var(--amber);border:1px solid rgba(255,176,32,.2);}
+.t-flag{background:rgba(255,59,59,.1);color:var(--red);border:1px solid rgba(255,59,59,.2);}
+.t-approve{background:rgba(255,184,0,.1);color:var(--gold);border:1px solid rgba(255,184,0,.2);}
+.old-v{background:rgba(255,59,59,.1);color:var(--red);font-family:var(--mono);font-size:9px;padding:1px 7px;border-radius:2px;border:1px solid rgba(255,59,59,.2);}
+.nw-v{background:rgba(0,232,122,.1);color:var(--green);font-family:var(--mono);font-size:9px;padding:1px 7px;border-radius:2px;border:1px solid rgba(0,232,122,.2);}
+
+/* ── INTELLIGENCE MAP ── */
+.intel-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;width:100%;}
+
+/* ── COMPARE TABLE ── */
+.cmp-table{width:100%;border-collapse:collapse;font-size:13px;}
+.cmp-table th{padding:10px 14px;font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text3);border-bottom:2px solid var(--b2);}
+.cmp-table td{padding:11px 14px;border-bottom:1px solid var(--b1);}
+.cmp-table tr:last-child td{border-bottom:none;}
+.cmp-f{font-weight:600;color:var(--text);font-family:var(--head);font-size:14px;}
+.cmp-bad{color:var(--red3);font-size:12px;}
+.cmp-good{color:var(--green);font-size:12px;}
+.cmp-hdr-bad{background:rgba(255,59,59,.12);color:var(--red);font-size:11px;padding:8px 14px;border-radius:4px;}
+.cmp-hdr-good{background:rgba(0,232,122,.1);color:var(--green);font-size:11px;padding:8px 14px;border-radius:4px;}
+
+/* ── FINAL SLIDE ── */
+.final-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:700px;}
+.final-item{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--s2);border:1px solid var(--b2);border-radius:8px;}
+.fi-check{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--green2),var(--green));display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.fi-text{font-family:var(--head);font-size:14px;font-weight:700;color:var(--text);letter-spacing:.3px;}
+
+/* ── TECH STACK GRID ── */
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;}
+.tech-item{background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:16px;text-align:center;}
+.tech-ico{font-size:26px;margin-bottom:8px;display:block;}
+.tech-name{font-family:var(--head);font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.tech-val{font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.5;}
+
+/* ── QUOTE ── */
+.quote-box{
+  background:var(--s2);border-left:4px solid var(--gold);
+  border-radius:0 10px 10px 0;padding:28px 32px;
+  max-width:740px;text-align:left;
+}
+.quote-text{font-family:var(--head);font-size:28px;font-weight:700;color:#fff;line-height:1.4;font-style:italic;margin-bottom:12px;}
+.quote-src{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:1.5px;}
+
+/* ── BACKGROUND ELEMENTS ── */
+.bg-hex{
+  position:absolute;font-size:400px;color:rgba(0,201,255,.02);
+  font-family:var(--mono);user-select:none;pointer-events:none;
+  font-weight:700;
+}
+.bg-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,201,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,201,255,.03) 1px,transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;
+}
+
+/* ── HASH STREAM ── */
+.hash-stream{
+  font-family:var(--mono);font-size:10px;color:rgba(0,201,255,.15);
+  white-space:nowrap;letter-spacing:.5px;line-height:2;
+  position:absolute;
+  animation:hashScroll 12s linear infinite;
+}
+
+/* ── LOGO ── */
+.logo-main{
+  display:flex;align-items:center;gap:18px;
+  margin-bottom:16px;
+}
+.logo-hex-big{
+  width:72px;height:72px;
+  background:linear-gradient(135deg,var(--accent3),var(--accent));
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:22px;font-weight:700;color:#fff;
+  box-shadow:0 0 40px rgba(0,201,255,.4);
+  flex-shrink:0;
+}
+.logo-text{
+  font-family:var(--head);font-size:72px;font-weight:800;
+  color:#fff;letter-spacing:6px;
+  text-shadow:0 0 40px rgba(0,201,255,.4);
+  line-height:1;
+}
+.logo-sub{
+  font-family:var(--mono);font-size:13px;color:var(--accent);
+  letter-spacing:4px;text-transform:uppercase;
+  margin-top:6px;
+}
+.team-badge{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(0,0,0,.3);border:1px solid var(--b2);
+  border-radius:6px;padding:10px 20px;
+  margin-top:24px;
+}
+.tb-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:2px;}
+.tb-value{font-family:var(--head);font-size:15px;font-weight:700;color:var(--text);}
+.tb-sep{color:var(--text3);}
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- SLIDE 1: TITLE -->
+  <div class="slide" id="s0">
+    <div class="bg-grid" style="opacity:.5;"></div>
+    <div style="position:absolute;top:60px;right:80px;text-align:right;" class="a1">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:2px;margin-bottom:4px;">ANANTAPUR POLICE HACKATHON 2026</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:2px;">INC-APT-2026-141</div>
+    </div>
+
+    <div class="logo-main a1" style="flex-direction:column;align-items:center;">
+      <div style="display:flex;align-items:center;gap:18px;">
+        <div class="logo-hex-big">EX</div>
+        <div>
+          <div class="logo-text">EVIDENCE-X</div>
+          <div class="logo-sub">A Human-Governed Cognitive FIR Intelligence System</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="a2" style="display:flex;gap:24px;margin-top:28px;flex-wrap:wrap;justify-content:center;">
+      <div style="text-align:center;padding:10px 20px;background:rgba(0,201,255,.06);border:1px solid rgba(0,201,255,.15);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:3px;">TRACK</div>
+        <div style="font-family:var(--head);font-size:14px;font-weight:700;color:var(--accent);">AI-Enabled OCR for Multilingual FIRs</div>
+      </div>
+      <div style="text-align:center;padding:10px 20px;background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.15);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:3px;">TEAM</div>
+        <div style="font-family:var(--head);font-size:14px;font-weight:700;color:var(--gold);">dreamers · INC-APT-2026-141</div>
+      </div>
+      <div style="text-align:center;padding:10px 20px;background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.15);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:3px;">LEAD</div>
+        <div style="font-family:var(--head);font-size:14px;font-weight:700;color:var(--green);">Rohit Hanuman Sai Puttagunta</div>
+      </div>
+    </div>
+
+    <div class="a3" style="margin-top:28px;display:flex;gap:32px;justify-content:center;">
+      <div style="text-align:center;"><div style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--accent);">Accuracy</div></div>
+      <div style="color:var(--text3);font-size:20px;align-self:center;">·</div>
+      <div style="text-align:center;"><div style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--gold);">Authorization</div></div>
+      <div style="color:var(--text3);font-size:20px;align-self:center;">·</div>
+      <div style="text-align:center;"><div style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--green);">Accountability</div></div>
+      <div style="color:var(--text3);font-size:20px;align-self:center;">·</div>
+      <div style="text-align:center;"><div style="font-family:var(--mono);font-size:24px;font-weight:700;color:var(--red);">Intelligence</div></div>
+    </div>
+
+    <div style="position:absolute;bottom:40px;font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:1.5px;" class="a4">
+      Prasad V. Potluri Siddhartha Institute of Technology
+    </div>
+  </div>
+
+
+  <!-- SLIDE 2: THE PROBLEM -->
+  <div class="slide" id="s1">
+    <div class="bg-grid"></div>
+    <div style="text-align:center;width:100%;margin-bottom:36px;">
+      <div class="slide-tag tag-red a1">THE PROBLEM</div>
+      <div class="slide-h2 a2" style="text-align:center;">Why Digitization Alone <span style="color:var(--red);">Fails</span></div>
+      <div class="slide-sub a3" style="margin:0 auto;font-size:16px;">India generates <strong style="color:var(--text);">50,000+ handwritten FIRs daily.</strong> Every single one is legally fragile.</div>
+    </div>
+    <div class="grid-3" style="max-width:1100px;">
+      <div class="gcard red a4">
+        <div style="width:44px;height:44px;background:var(--red2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:800;color:#fff;margin-bottom:14px;">01</div>
+        <div class="card-title" style="color:var(--red3);">Data Inaccessibility</div>
+        <div class="card-body">Handwritten Telugu & English FIRs trapped in physical archives. State-wide pattern detection and cross-district intelligence is <strong style="color:var(--text2);">impossible.</strong></div>
+      </div>
+      <div class="gcard amber a5">
+        <div style="width:44px;height:44px;background:rgba(255,176,32,.3);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:800;color:var(--amber);margin-bottom:14px;">02</div>
+        <div class="card-title" style="color:var(--amber);">Legal Fragility</div>
+        <div class="card-body">AI transcriptions without a provable link to the original are routinely <strong style="color:var(--text2);">challenged in court.</strong> Hallucinations create inadmissible records.</div>
+      </div>
+      <div class="gcard gold a6">
+        <div style="width:44px;height:44px;background:rgba(255,184,0,.25);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;font-weight:800;color:var(--gold);margin-bottom:14px;">03</div>
+        <div class="card-title" style="color:var(--gold);">Integrity Risk</div>
+        <div class="card-body">No granular audit trail means records are vulnerable to <strong style="color:var(--text2);">unauthorized modification, deletion, or going 'missing'. No accountability exists.</strong></div>
+      </div>
+    </div>
+    <div class="a6" style="margin-top:28px;font-family:var(--mono);font-size:12px;color:var(--text3);text-align:center;letter-spacing:.5px;">
+      📊 &nbsp;85% of FIRs remain handwritten &nbsp;·&nbsp; OCR-only solutions fail all three pillars: Accuracy, Accountability, Admissibility
+    </div>
+  </div>
+
+
+  <!-- SLIDE 3: OUR SOLUTION -->
+  <div class="slide" id="s2">
+    <div class="bg-grid"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;width:100%;max-width:1100px;align-items:center;">
+      <div>
+        <div class="slide-tag tag-accent a1">OUR SOLUTION</div>
+        <div class="slide-h2 a2">EVIDENCE-X:<br/><span style="color:var(--accent);">Cognitive Governance</span><br/>Infrastructure</div>
+        <div class="a3" style="font-size:15px;color:var(--text3);line-height:1.8;margin-bottom:24px;">Not just a digitization tool. A system where <strong style="color:var(--text);">AI assists</strong> and <strong style="color:var(--text);">humans govern</strong> every decision that enters the legal record.</div>
+        <div class="quote-box a4" style="margin:0;">
+          <div class="quote-text" style="font-size:22px;">"AI is the high-speed clerk.<br/>The Officer is the ultimate authority."</div>
+          <div class="quote-src">Human-in-the-Loop (HITL) Intelligence at every stage</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="gcard blue a2" style="display:flex;align-items:center;gap:16px;padding:18px 20px;">
+          <div style="font-size:28px;flex-shrink:0;">🤖</div>
+          <div><div class="card-title" style="margin-bottom:4px;">AI Reconstruction</div><div class="card-body">Hybrid TrOCR + LLM engine with Confidence Heatmap</div></div>
+        </div>
+        <div class="gcard gold a3" style="display:flex;align-items:center;gap:16px;padding:18px 20px;">
+          <div style="font-size:28px;flex-shrink:0;">👮</div>
+          <div><div class="card-title" style="margin-bottom:4px;">Human Validation</div><div class="card-body">Officers review only flagged low-confidence fields</div></div>
+        </div>
+        <div class="gcard green a4" style="display:flex;align-items:center;gap:16px;padding:18px 20px;">
+          <div style="font-size:28px;flex-shrink:0;">🔐</div>
+          <div><div class="card-title" style="margin-bottom:4px;">Cryptographic Seal</div><div class="card-body">SHA-256 chain of custody — tamper-evident forever</div></div>
+        </div>
+        <div class="gcard red a5" style="display:flex;align-items:center;gap:16px;padding:18px 20px;">
+          <div style="font-size:28px;flex-shrink:0;">⚡</div>
+          <div><div class="card-title" style="margin-bottom:4px;">Active Intelligence</div><div class="card-body">Entities, M.O. patterns, cross-district linking</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SLIDE 4: ARCHITECTURE -->
+  <div class="slide" id="s3">
+    <div class="bg-grid"></div>
+    <div style="text-align:center;margin-bottom:30px;width:100%;">
+      <div class="slide-tag tag-accent a1">ARCHITECTURE</div>
+      <div class="slide-h2 a2" style="text-align:center;">Six-Tier <span style="color:var(--accent);">Governance Pipeline</span></div>
+      <div class="a3" style="font-size:15px;color:var(--text3);">Each tier has a singular responsibility. Together: an unbreakable chain from paper to intelligence.</div>
+    </div>
+    <div class="tier-row a3">
+      <div class="tier-item"><div class="tier-num" style="background:rgba(0,201,255,.2);color:var(--accent);">1</div><div style="font-size:22px;margin-bottom:4px;">🔭</div><div class="tier-label" style="color:var(--accent);">Intelligent<br/>Ingestion</div><div class="tier-sub">"The Lens"</div></div>
+      <div class="tier-arrow">›</div>
+      <div class="tier-item"><div class="tier-num" style="background:rgba(0,201,255,.18);color:var(--accent);">2</div><div style="font-size:22px;margin-bottom:4px;">🤖</div><div class="tier-label" style="color:var(--accent);">Cognitive<br/>Reconstruction</div><div class="tier-sub">"The Brain"</div></div>
+      <div class="tier-arrow">›</div>
+      <div class="tier-item"><div class="tier-num" style="background:rgba(255,184,0,.2);color:var(--gold);">3</div><div style="font-size:22px;margin-bottom:4px;">👮</div><div class="tier-label" style="color:var(--gold);">Human<br/>Validation</div><div class="tier-sub">"The Authority"</div></div>
+      <div class="tier-arrow">›</div>
+      <div class="tier-item"><div class="tier-num" style="background:rgba(0,232,122,.2);color:var(--green);">4</div><div style="font-size:22px;margin-bottom:4px;">🛡️</div><div class="tier-label" style="color:var(--green);">Security<br/>Ledger</div><div class="tier-sub">"The Shield"</div></div>
+      <div class="tier-arrow">›</div>
+      <div class="tier-item"><div class="tier-num" style="background:rgba(255,176,32,.2);color:var(--amber);">5</div><div style="font-size:22px;margin-bottom:4px;">🌐</div><div class="tier-label" style="color:var(--amber);">Multi-Lang<br/>Standard.</div><div class="tier-sub">"The Translator"</div></div>
+      <div class="tier-arrow">›</div>
+      <div class="tier-item"><div class="tier-num" style="background:rgba(255,59,59,.2);color:var(--red);">6</div><div style="font-size:22px;margin-bottom:4px;">⚡</div><div class="tier-label" style="color:var(--red);">Intelligence<br/>Synthesis</div><div class="tier-sub">"The Sword"</div></div>
+    </div>
+    <div class="grid-3" style="max-width:1100px;gap:14px;">
+      <div class="gcard blue a4" style="padding:18px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--accent);letter-spacing:2px;margin-bottom:8px;">TIER 1–2 · INGEST + RECONSTRUCT</div>
+        <div style="font-size:13px;color:var(--text3);line-height:1.7;">OpenCV image cleaning → Offline SHA-256 hash lock → TrOCR dual-path OCR → Mistral-7B IPC-aware semantic reconstruction → Confidence scores generated</div>
+      </div>
+      <div class="gcard gold a5" style="padding:18px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--gold);letter-spacing:2px;margin-bottom:8px;">TIER 3–4 · VALIDATE + SECURE</div>
+        <div style="font-size:13px;color:var(--text3);line-height:1.7;">Officer surgical validation on Red fields only → Role-based authority control → Supervisor approval for high-impact fields → SHA-256 composite seal applied</div>
+      </div>
+      <div class="gcard red a6" style="padding:18px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--red);letter-spacing:2px;margin-bottom:8px;">TIER 5–6 · STANDARDIZE + ANALYSE</div>
+        <div style="font-size:13px;color:var(--text3);line-height:1.7;">EN + TE + HI outputs, all hash-linked → CCTNS schema export → NER entity extraction → M.O. vector search → Cross-district suspect linking</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SLIDE 5: CONFIDENCE HEATMAP (KEY INNOVATION) -->
+  <div class="slide" id="s4">
+    <div class="bg-grid"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;width:100%;max-width:1100px;align-items:start;">
+      <div>
+        <div class="slide-tag tag-gold a1">KEY INNOVATION</div>
+        <div class="slide-h2 a2">Confidence <span style="color:var(--gold);">Heatmap</span><br/>Validation UI</div>
+        <div class="a3" style="font-size:14px;color:var(--text3);line-height:1.7;margin-bottom:20px;">Officers only touch what AI isn't sure about. Every word gets a confidence band — red ones demand attention, green ones are done.</div>
+        <div class="a4" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.2);border-radius:6px;">
+            <div style="width:12px;height:12px;background:var(--green);border-radius:2px;flex-shrink:0;"></div>
+            <div><strong style="color:var(--green);">GREEN &gt;90%</strong> <span style="font-size:13px;color:var(--text3);">— Auto-verified. No officer input required.</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.2);border-radius:6px;">
+            <div style="width:12px;height:12px;background:var(--amber);border-radius:2px;flex-shrink:0;"></div>
+            <div><strong style="color:var(--amber);">YELLOW 60–90%</strong> <span style="font-size:13px;color:var(--text3);">— Review recommended. Click to inspect.</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.2);border-radius:6px;">
+            <div style="width:12px;height:12px;background:var(--red);border-radius:2px;flex-shrink:0;"></div>
+            <div><strong style="color:var(--red);">RED &lt;60%</strong> <span style="font-size:13px;color:var(--text3);">— MANDATORY. Auto-focus. Must approve.</span></div>
+          </div>
+        </div>
+        <div class="a5" style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:16px;">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:2px;margin-bottom:10px;">FEATURES</div>
+          <div style="font-size:13px;color:var(--text3);line-height:2;">▸ Split-screen: original scan vs AI draft<br/>▸ Auto-cursor advances to next RED field<br/>▸ IPC-aware suggestions on every flagged word<br/>▸ <strong style="color:var(--gold);">85% reduction</strong> in manual validation time</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="a3" style="font-size:9px;font-family:var(--mono);color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">AI Reconstructed Draft<span style="flex:1;height:1px;background:var(--b1);"></span></div>
+        <div class="ai-paper a3">
+          <span class="w-g">FIRST INFORMATION REPORT</span><br/>
+          <span class="w-g">FIR No: 2026/ANT/0142</span><br/>
+          <span class="w-g">Date: 15-Jan-2026 &nbsp;&nbsp; Station: Anantapur Town PS</span><br/><br/>
+          <span class="w-g">Complainant: Venkat Reddy, S/O Ramaiah.</span><br/><br/>
+          <span class="w-g">The accused stole goods worth </span>
+          <span class="w-r" title="41% confidence">Rs. 4500/-</span>
+          <span class="w-g"> and escaped in a </span>
+          <span class="w-y" title="68% confidence">white</span>
+          <span class="w-g"> Maruti Suzuki bearing </span>
+          <span class="w-r" title="38% confidence">AP28 XK 1234.</span><br/><br/>
+          <span class="w-g">IPC Sections: 457, </span>
+          <span class="w-r" title="44% confidence">380</span>
+          <span class="w-g"> IPC.</span>
+        </div>
+        <div style="position:relative;margin-top:12px;" class="a5">
+          <div class="popup-box">
+            <div class="popup-title">⚠ VALIDATE: Rs. 4500/- (41% conf)</div>
+            <div class="popup-sug hi">Rs. 45,000/- <span class="sug-pct">94%</span></div>
+            <div class="popup-sug">Rs. 4,500/- <span class="sug-pct">87%</span></div>
+            <div class="popup-sug">Rs. 45,500/- <span class="sug-pct">71%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SLIDE 6: SECURITY + AUDIT -->
+  <div class="slide" id="s5">
+    <div class="bg-grid"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;width:100%;max-width:1100px;align-items:start;">
+      <div>
+        <div class="slide-tag tag-green a1">SECURITY</div>
+        <div class="slide-h2 a2">Immutable Audit Ledger &<br/><span style="color:var(--green);">Cryptographic Chain</span></div>
+        <div class="a3" style="font-size:14px;color:var(--text3);line-height:1.7;margin-bottom:18px;">Tampering is mathematically impossible. Every action leaves a permanent, unerasable footprint.</div>
+        <div class="a4" style="background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:18px;margin-bottom:14px;">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:1.5px;margin-bottom:12px;">SHA-256 SECURITY FORMULA</div>
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;">
+            <div style="background:rgba(0,201,255,.1);border:1px solid rgba(0,201,255,.2);border-radius:6px;padding:10px 14px;text-align:center;flex:1;">
+              <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);">H_orig</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:3px;">Original scan fingerprint</div>
+            </div>
+            <div style="color:var(--text3);font-size:18px;">→</div>
+            <div style="background:rgba(0,232,122,.08);border:1px solid rgba(0,232,122,.2);border-radius:6px;padding:10px 14px;text-align:center;flex:1;">
+              <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--green);">H_final</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:3px;">Composite seal</div>
+            </div>
+          </div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--green);text-align:center;">= SHA-256( Scan + Audit Log + Approved Text )</div>
+        </div>
+        <div class="a5" style="display:flex;flex-direction:column;gap:7px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text3);"><span style="color:var(--green);">✓</span> Any post-approval modification breaks the seal — instantly detectable</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text3);"><span style="color:var(--green);">✓</span> Granular log: UserID · FieldID · OldValue · NewValue · Timestamp</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text3);"><span style="color:var(--green);">✓</span> Satisfies Indian Evidence Act requirements for electronic records</div>
+        </div>
+      </div>
+      <div>
+        <div class="audit-feed a3">
+          <div class="af-header">
+            <div class="af-title">IMMUTABLE AUDIT LEDGER — FIR 2026/ANT/0142</div>
+            <div class="af-badge">SHA-256 VERIFIED</div>
+          </div>
+          <div class="ae"><div class="ae-t">23:44:02</div><div class="ae-ico2">📥</div><div class="ae-b"><div class="ae-a"><span class="t-tag t-create">CREATE</span>FIR Ingested</div><div class="ae-m">SI_PRASAD_01 · Source: Mobile Camera · 2.4MB</div></div></div>
+          <div class="ae"><div class="ae-t">23:44:03</div><div class="ae-ico2">🔒</div><div class="ae-b"><div class="ae-a"><span class="t-tag t-seal">SEAL</span>H_orig Generated</div><div class="ae-m">a3f9b821cd4e… locked · Document fingerprinted</div></div></div>
+          <div class="ae"><div class="ae-t">23:44:08</div><div class="ae-ico2">🤖</div><div class="ae-b"><div class="ae-a"><span class="t-tag t-create">CREATE</span>AI Reconstruction Complete</div><div class="ae-m">TrOCR+Mistral · 84.2% conf · 3 Red zones</div></div></div>
+          <div class="ae"><div class="ae-t">23:52:15</div><div class="ae-ico2">✏️</div><div class="ae-b"><div class="ae-a"><span class="t-tag t-edit">EDIT</span>Field Edited: AMOUNT</div><div class="ae-m"><span class="old-v">Rs. 4500/-</span> → <span class="nw-v">Rs. 45,000/-</span> · SI_PRASAD_01</div></div></div>
+          <div class="ae"><div class="ae-t">23:53:10</div><div class="ae-ico2">📤</div><div class="ae-b"><div class="ae-a"><span class="t-tag t-flag">FLAG</span>Supervisor Notified</div><div class="ae-m">DSP_RAVI_02 alerted · High-impact field change</div></div></div>
+          <div class="ae"><div class="ae-t">23:58:47</div><div class="ae-ico2">✅</div><div class="ae-b"><div class="ae-a"><span class="t-tag t-approve">APPROVE</span>Supervisor Approved ×2</div><div class="ae-m">DSP_RAVI_02 · Secondary authorization confirmed</div></div></div>
+          <div class="ae"><div class="ae-t">23:59:44</div><div class="ae-ico2">🔐</div><div class="ae-b"><div class="ae-a"><span class="t-tag t-seal">SEAL</span>Record Digitally Sealed</div><div class="ae-m">H_final: 7e4c9b1f… — Tamper-evident forever</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SLIDE 7: INTELLIGENCE -->
+  <div class="slide" id="s6">
+    <div class="bg-grid"></div>
+    <div style="text-align:center;margin-bottom:24px;width:100%;">
+      <div class="slide-tag tag-red a1">INTELLIGENCE SYNTHESIS</div>
+      <div class="slide-h2 a2" style="text-align:center;">Validated Records Become <span style="color:var(--red);">Active Intelligence</span></div>
+    </div>
+    <div style="background:rgba(255,59,59,.06);border:1px solid rgba(255,59,59,.2);border-radius:8px;padding:14px 20px;margin-bottom:20px;width:100%;max-width:1100px;" class="a3">
+      <div style="font-family:var(--head);font-size:16px;font-weight:700;color:var(--red3);display:flex;align-items:center;gap:10px;">🚨 CROSS-DISTRICT ALERT — Vehicle <strong style="color:var(--red);">AP28 XK 1234</strong> previously recorded in FIR 2025/KNL/0874 (Kurnool, Oct 2025 — Commercial Burglary). Same M.O. Possible linked accused.</div>
+    </div>
+    <div class="grid-3" style="max-width:1100px;gap:16px;">
+      <div class="gcard blue a4">
+        <div style="font-family:var(--head);font-size:16px;font-weight:700;color:var(--accent);margin-bottom:12px;">🔍 Named Entity Extraction</div>
+        <div style="font-size:12px;color:var(--text3);line-height:2;">▸ Persons: Venkat Reddy (Complainant)<br/>▸ Accused: Unknown (2–3 persons)<br/>▸ Vehicle: AP28 XK 1234 — Maruti<br/>▸ Location: MG Road, Anantapur<br/>▸ IO: SI Prasad Kumar</div>
+      </div>
+      <div class="gcard amber a5">
+        <div style="font-family:var(--head);font-size:16px;font-weight:700;color:var(--amber);margin-bottom:12px;">⚡ M.O. Pattern Detection</div>
+        <div style="font-size:12px;color:var(--text3);line-height:2;">▸ Night burglary (22:00–01:00 hrs)<br/>▸ Electronics targeted — consistent<br/>▸ Motor vehicle escape — same corridor<br/>▸ Semantic Vector Search: <strong style="color:var(--text);">5 AP-wide matches</strong><br/>▸ No forced entry — lock-pick suspected</div>
+      </div>
+      <div class="gcard red a6">
+        <div style="font-family:var(--head);font-size:16px;font-weight:700;color:var(--red3);margin-bottom:12px;">🗺 State-Wide Linking</div>
+        <div style="font-size:12px;color:var(--text3);line-height:2;">▸ Vehicle match: ANT ↔ KNL districts<br/>▸ Suspect profile linked across 2 FIRs<br/>▸ Time window: Oct 2025 – Jan 2026<br/>▸ Geographic corridor: NH-44 flagged<br/>▸ <strong style="color:var(--text);">Detectives alerted in both districts</strong></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- SLIDE 8: MULTILINGUAL OUTPUT -->
+  <div class="slide" id="s7">
+    <div class="bg-grid"></div>
+    <div style="text-align:center;margin-bottom:28px;width:100%;">
+      <div class="slide-tag tag-accent a1">MULTILINGUAL OUTPUT</div>
+      <div class="slide-h2 a2" style="text-align:center;">Same Record. Three Languages.<br/><span style="color:var(--accent);">One Root Hash. All Court-Admissible.</span></div>
+    </div>
+    <div class="grid-3" style="max-width:1100px;">
+      <div class="gcard blue a4" style="padding:20px;">
+        <div style="font-size:22px;margin-bottom:8px;">🇬🇧</div>
+        <div style="font-family:var(--head);font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px;">Standard English</div>
+        <div style="font-family:var(--mono);font-size:8px;color:var(--accent);letter-spacing:1.5px;margin-bottom:10px;">✓ CANONICAL LEGAL VERSION</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.8;">On 15th January 2026, at approximately 23:00 hrs, accused persons committed commercial burglary at MG Road, Anantapur. Electronic goods worth Rs. 45,000/- stolen. Accused fled in vehicle AP28 XK 1234.</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:10px;word-break:break-all;">H: 7e4c9b1f… [linked to original]</div>
+      </div>
+      <div class="gcard gold a5" style="padding:20px;">
+        <div style="font-size:22px;margin-bottom:8px;">🇮🇳</div>
+        <div style="font-family:var(--head);font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px;">Telugu — తెలుగు</div>
+        <div style="font-family:var(--mono);font-size:8px;color:var(--gold);letter-spacing:1.5px;margin-bottom:10px;">✓ REGIONAL OUTPUT — VERIFIED</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.9;">15 జనవరి 2026 న, అనంతపురంలోని MG రోడ్‌లో వ్యాపార దొంగతనం జరిగింది. రూ.45,000 విలువైన వస్తువులు దొంగిలించబడ్డాయి. నిందితులు AP28 XK 1234 వాహనంలో పారిపోయారు.</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:10px;word-break:break-all;">H: 7e4c9b1f… [linked to original]</div>
+      </div>
+      <div class="gcard green a6" style="padding:20px;">
+        <div style="font-size:22px;margin-bottom:8px;">🇮🇳</div>
+        <div style="font-family:var(--head);font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px;">Hindi — हिंदी</div>
+        <div style="font-family:var(--mono);font-size:8px;color:var(--green);letter-spacing:1.5px;margin-bottom:10px;">✓ REGIONAL OUTPUT — VERIFIED</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.9;">15 जनवरी 2026 को अनंतपुर के MG रोड पर वाणिज्यिक चोरी हुई। ₹45,000 मूल्य का सामान चोरी हुआ। आरोपी वाहन AP28 XK 1234 से फरार हुए।</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:10px;word-break:break-all;">H: 7e4c9b1f… [linked to original]</div>
+      </div>
+    </div>
+    <div class="a6" style="margin-top:18px;font-family:var(--mono);font-size:11px;color:var(--text3);text-align:center;max-width:800px;">
+      💡 "A suspect's name recorded in Telugu at Anantapur is instantly searchable in English by detectives in Hyderabad — with the same legal weight as the original handwritten document."
+    </div>
+  </div>
+
+
+  <!-- SLIDE 9: TECH STACK -->
+  <div class="slide" id="s8">
+    <div class="bg-grid"></div>
+    <div style="text-align:center;margin-bottom:28px;width:100%;">
+      <div class="slide-tag tag-accent a1">TECH STACK</div>
+      <div class="slide-h2 a2" style="text-align:center;">Technology Stack & <span style="color:var(--accent);">System Specifications</span></div>
+      <div class="a3" style="font-size:14px;color:var(--text3);">Production-grade · Offline-capable · CCTNS-ready · Deployable on standard police station hardware</div>
+    </div>
+    <div class="tech-grid" style="max-width:1100px;">
+      <div class="tech-item a4"><span class="tech-ico">🔭</span><div class="tech-name">Vision & OCR</div><div class="tech-val">OpenCV · PyTorch<br/>Donut · TrOCR</div></div>
+      <div class="tech-item a4"><span class="tech-ico">🤖</span><div class="tech-name">AI Reconstruction</div><div class="tech-val">LangChain<br/>Llama-3 / Mistral-7B</div></div>
+      <div class="tech-item a5"><span class="tech-ico">⚙️</span><div class="tech-name">Backend API</div><div class="tech-val">FastAPI · Python 3.12<br/>Async REST</div></div>
+      <div class="tech-item a5"><span class="tech-ico">🔐</span><div class="tech-name">Security</div><div class="tech-val">SHA-256 · JWT RBAC<br/>Python hashlib</div></div>
+      <div class="tech-item a6"><span class="tech-ico">🎨</span><div class="tech-name">Frontend UI</div><div class="tech-val">React.js · Tailwind CSS<br/>Heatmap Visualization</div></div>
+      <div class="tech-item a6"><span class="tech-ico">🗄️</span><div class="tech-name">Data Layer</div><div class="tech-val">PostgreSQL (records)<br/>Redis (real-time audit)</div></div>
+      <div class="tech-item a6" style="animation-delay:.9s"><span class="tech-ico">📡</span><div class="tech-name">Offline Support</div><div class="tech-val">Quantized inference<br/>Local hashing first</div></div>
+      <div class="tech-item a6" style="animation-delay:1.05s"><span class="tech-ico">🔗</span><div class="tech-name">Integration</div><div class="tech-val">CCTNS schema<br/>Multilingual NLP</div></div>
+    </div>
+    <div class="a6" style="margin-top:20px;background:rgba(0,232,122,.05);border:1px solid rgba(0,232,122,.2);border-radius:6px;padding:10px 24px;font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.5px;max-width:800px;">
+      ⚡ OFFLINE-FIRST: All OCR + LLM inference runs locally on station hardware. No internet required. Cloud sync when connectivity is available.
+    </div>
+  </div>
+
+
+  <!-- SLIDE 10: IMPACT + COMPARISON -->
+  <div class="slide" id="s9">
+    <div class="bg-grid"></div>
+    <div style="text-align:center;margin-bottom:24px;width:100%;">
+      <div class="slide-tag tag-green a1">IMPACT</div>
+      <div class="slide-h2 a2" style="text-align:center;">Results & <span style="color:var(--green);">Competitive Advantage</span></div>
+    </div>
+    <div class="big-stats a3" style="margin-bottom:24px;">
+      <div class="bstat"><span class="bstat-num" style="color:var(--gold);">85%</span><div class="bstat-lbl">Reduction in validation time per FIR</div></div>
+      <div class="bstat"><span class="bstat-num" style="color:var(--green);">99.2%</span><div class="bstat-lbl">Legal admissibility rate</div></div>
+      <div class="bstat"><span class="bstat-num" style="color:var(--accent);">6+</span><div class="bstat-lbl">Languages & output formats</div></div>
+      <div class="bstat"><span class="bstat-num" style="color:var(--red);">0</span><div class="bstat-lbl">Unauthorized edits possible (sealed)</div></div>
+    </div>
+    <div style="width:100%;max-width:960px;" class="a4">
+      <table class="cmp-table">
+        <thead><tr>
+          <th style="text-align:left;width:220px;">FEATURE</th>
+          <th><div class="cmp-hdr-bad">Traditional OCR</div></th>
+          <th><div class="cmp-hdr-good">EVIDENCE-X</div></th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="cmp-f">Text Reconstruction</td><td class="cmp-bad">Raw characters only</td><td class="cmp-good">Context-aware LLM + IPC-aware</td></tr>
+          <tr><td class="cmp-f">Validation</td><td class="cmp-bad">Full manual re-type</td><td class="cmp-good">AI-targeted Surgical Validation</td></tr>
+          <tr><td class="cmp-f">Accountability</td><td class="cmp-bad">None — no audit trail</td><td class="cmp-good">Every keystroke cryptographically logged</td></tr>
+          <tr><td class="cmp-f">Legal Admissibility</td><td class="cmp-bad">Often court-challenged</td><td class="cmp-good">SHA-256 satisfies Indian Evidence Act</td></tr>
+          <tr><td class="cmp-f">Multi-language Output</td><td class="cmp-bad">Not supported</td><td class="cmp-good">EN + TE + HI — all hash-linked</td></tr>
+          <tr><td class="cmp-f">Offline Capability</td><td class="cmp-bad">Cloud dependent</td><td class="cmp-good">Full functionality — no internet needed</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <!-- SLIDE 11: CLOSING -->
+  <div class="slide" id="s10">
+    <div class="bg-grid" style="opacity:.4;"></div>
+
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent),var(--gold),var(--green));"></div>
+
+    <div class="a1" style="text-align:center;margin-bottom:20px;">
+      <div style="display:inline-flex;align-items:center;gap:14px;margin-bottom:12px;">
+        <div class="logo-hex-big" style="width:56px;height:56px;font-size:16px;">EX</div>
+        <div style="font-family:var(--head);font-size:56px;font-weight:800;color:#fff;letter-spacing:4px;text-shadow:0 0 30px rgba(0,201,255,.3);">EVIDENCE-X</div>
+      </div>
+      <div style="font-family:var(--head);font-size:26px;font-weight:600;color:var(--text2);letter-spacing:2px;">From Paper Record to Provable Intelligence.</div>
+    </div>
+
+    <div class="final-grid a2" style="margin-bottom:28px;">
+      <div class="final-item"><div class="fi-check" style="background:linear-gradient(135deg,var(--accent3),var(--accent));">✓</div><div class="fi-text">Accuracy — TrOCR + LLM IPC Context</div></div>
+      <div class="final-item"><div class="fi-check" style="background:linear-gradient(135deg,var(--gold2),var(--gold));">✓</div><div class="fi-text">Authorization — Role-Based HITL Governance</div></div>
+      <div class="final-item"><div class="fi-check" style="background:linear-gradient(135deg,var(--green2),var(--green));">✓</div><div class="fi-text">Accountability — SHA-256 Cryptographic Audit</div></div>
+      <div class="final-item"><div class="fi-check" style="background:linear-gradient(135deg,var(--red2),var(--red));">✓</div><div class="fi-text">Intelligence — NER + M.O. + District Linking</div></div>
+    </div>
+
+    <div class="a3" style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:18px 28px;max-width:760px;text-align:center;margin-bottom:24px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:3px;margin-bottom:8px;">WHAT WE BUILT</div>
+      <div style="font-size:13px;color:var(--text3);line-height:2;">
+        🔭 6-Tier Modular Governance Pipeline &nbsp;·&nbsp;
+        🤖 Dual-Path OCR + LLM Reconstruction Engine<br/>
+        👮 Confidence Heatmap Validation UI — Live Prototype &nbsp;·&nbsp;
+        🔐 SHA-256 Immutable Audit Ledger<br/>
+        🌐 3-Language Output (EN + TE + HI) — CCTNS-ready &nbsp;·&nbsp;
+        📡 Offline-First Architecture
+      </div>
+    </div>
+
+    <div class="a4" style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;">
+      <div style="text-align:center;padding:10px 20px;background:rgba(0,201,255,.06);border:1px solid rgba(0,201,255,.15);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:3px;">TEAM</div>
+        <div style="font-family:var(--head);font-size:15px;font-weight:700;color:var(--accent);">dreamers</div>
+      </div>
+      <div style="text-align:center;padding:10px 20px;background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.15);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:3px;">ID</div>
+        <div style="font-family:var(--head);font-size:15px;font-weight:700;color:var(--gold);">INC-APT-2026-141</div>
+      </div>
+      <div style="text-align:center;padding:10px 20px;background:rgba(0,232,122,.06);border:1px solid rgba(0,232,122,.15);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:3px;">INSTITUTE</div>
+        <div style="font-family:var(--head);font-size:15px;font-weight:700;color:var(--green);">PVP Siddhartha IT</div>
+      </div>
+      <div style="text-align:center;padding:10px 20px;background:rgba(255,59,59,.06);border:1px solid rgba(255,59,59,.15);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:3px;">EVENT</div>
+        <div style="font-family:var(--head);font-size:15px;font-weight:700;color:var(--red3);">Anantapur Police Hackathon 2026</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /stage -->
+
+<!-- PROGRESS + CONTROLS -->
+<div id="progressBar" style="width:0%;"></div>
+<div id="slideCounter">1 / 11</div>
+<div id="controls">
+  <button class="ctrl-btn" onclick="prevSlide()">◀ PREV</button>
+  <button class="ctrl-btn" onclick="toggleAuto()" id="autoBtn"><span id="timerDot"></span><span id="autoLabel">AUTO-PLAY ON</span></button>
+  <button class="ctrl-btn" onclick="nextSlide()">NEXT ▶</button>
+</div>
+
+<script>
+const SLIDES = document.querySelectorAll('.slide');
+const TOTAL = SLIDES.length;
+// Duration per slide in seconds
+const DURATIONS = [7, 8, 8, 9, 10, 9, 8, 8, 8, 9, 10];
+let current = 0;
+let autoPlay = true;
+let timer = null;
+
+function showSlide(n){
+  SLIDES.forEach(s => s.classList.remove('active'));
+  current = ((n % TOTAL) + TOTAL) % TOTAL;
+  SLIDES[current].classList.add('active');
+
+  // Restart animations by cloning animated children
+  const animated = SLIDES[current].querySelectorAll('[class*="a"]');
+  animated.forEach(el => {
+    const cls = el.className;
+    el.className = cls; // re-trigger
+    void el.offsetWidth;
+    el.className = cls;
+  });
+
+  document.getElementById('slideCounter').textContent = (current+1)+' / '+TOTAL;
+  document.getElementById('progressBar').style.width = (((current+1)/TOTAL)*100)+'%';
+
+  if(autoPlay) scheduleNext();
+}
+
+function scheduleNext(){
+  clearTimeout(timer);
+  const dur = (DURATIONS[current] || 8) * 1000;
+  timer = setTimeout(() => { showSlide(current+1); }, dur);
+}
+
+function nextSlide(){ clearTimeout(timer); showSlide(current+1); if(autoPlay) scheduleNext(); }
+function prevSlide(){ clearTimeout(timer); showSlide(current-1); if(autoPlay) scheduleNext(); }
+
+function toggleAuto(){
+  autoPlay = !autoPlay;
+  document.getElementById('autoLabel').textContent = autoPlay ? 'AUTO-PLAY ON' : 'AUTO-PLAY OFF';
+  document.getElementById('timerDot').style.background = autoPlay ? 'var(--green)' : 'var(--text3)';
+  if(autoPlay) scheduleNext(); else clearTimeout(timer);
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if(e.key==='ArrowRight'||e.key===' ') nextSlide();
+  if(e.key==='ArrowLeft') prevSlide();
+  if(e.key==='Escape') toggleAuto();
+});
+
+// Swipe support
+let tx=0;
+document.addEventListener('touchstart',e=>{ tx=e.touches[0].clientX; });
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(dx<-50) nextSlide();
+  if(dx>50)  prevSlide();
+});
+
+// Init
+showSlide(0);
+</script>
+</body>
+</html>
